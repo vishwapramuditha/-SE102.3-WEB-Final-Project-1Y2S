@@ -1,0 +1,11 @@
+{
+  "name": "nsbm/newsdesk",
+  "description": "NSBM NewsDesk - Campus News Management System (SE102.3 Web Final Project)",
+  "type": "project",
+  "require": {
+    "php": "^8.0 || ^8.1 || ^8.2",
+    "ext-pdo": "*",
+    "ext-pdo_mysql": "*"
+  }
+}
+
