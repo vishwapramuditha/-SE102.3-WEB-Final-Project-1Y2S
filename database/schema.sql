@@ -1,10 +1,3 @@
--- ===============================================================
--- NSBM NewsDesk - Campus News Management System
--- Module: Web and Mobile Application Development (SE102.3)
--- Batch: 26.1 IFSL | Faculty of Computing | NSBM Green University
--- Database Schema and Sample Data
--- ===============================================================
-
 CREATE DATABASE IF NOT EXISTS `nsbm_newsdesk` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `nsbm_newsdesk`;
 
