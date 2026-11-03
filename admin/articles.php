@@ -1,6 +1,6 @@
 <?php
 /**
- * Admin Dashboard Control Centre
+ * Manage News Articles (Admin CRUD)
  * Module: Web and Mobile Application Development (SE102.3)
  * NSBM Green University - Faculty of Computing
  */
@@ -13,74 +13,99 @@ if (!$db) {
     die("Database connection error. Please run setup.php.");
 }
 
-// KPI Metrics
-$totalArticles = 0;
-$pendingSubmissions = 0;
-$totalViews = 0;
-$totalComments = 0;
+// 1. Handle Quick Toggles & Deletions
+// A. Toggle Featured Flag
+if (isset($_GET['toggle_featured']) && is_numeric($_GET['toggle_featured'])) {
+    $artId = (int)$_GET['toggle_featured'];
+    try {
+        $stmt = $db->prepare("UPDATE articles SET is_featured = 1 - is_featured WHERE id = ?");
+        $stmt->execute([$artId]);
+        setFlashMessage('success', 'Featured status updated.');
+        redirect('articles.php');
+    } catch (PDOException $e) {}
+}
 
-$recentSubmissions = [];
-$recentArticles = [];
-$recentComments = [];
+// B. Toggle Breaking News Flag
+if (isset($_GET['toggle_breaking']) && is_numeric($_GET['toggle_breaking'])) {
+    $artId = (int)$_GET['toggle_breaking'];
+    try {
+        $stmt = $db->prepare("UPDATE articles SET is_breaking = 1 - is_breaking WHERE id = ?");
+        $stmt->execute([$artId]);
+        setFlashMessage('success', 'Breaking news flag updated.');
+        redirect('articles.php');
+    } catch (PDOException $e) {}
+}
 
+// C. Delete Article
+if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
+    $artId = (int)$_GET['id'];
+    try {
+        $del = $db->prepare("DELETE FROM articles WHERE id = ?");
+        $del->execute([$artId]);
+        setFlashMessage('info', 'Article #' . $artId . ' deleted successfully.');
+        redirect('articles.php');
+    } catch (PDOException $e) {
+        setFlashMessage('danger', 'Error deleting article: ' . $e->getMessage());
+    }
+}
+
+// 2. Filters & Search Query
+$searchQuery = trim($_GET['q'] ?? '');
+$filterCategory = trim($_GET['category'] ?? '');
+$filterStatus = trim($_GET['status'] ?? '');
+
+$where = ["1=1"];
+$params = [];
+
+if (!empty($searchQuery)) {
+    $where[] = "(a.title LIKE ? OR a.content LIKE ?)";
+    $like = '%' . $searchQuery . '%';
+    $params[] = $like;
+    $params[] = $like;
+}
+
+if (!empty($filterCategory)) {
+    $where[] = "c.slug = ?";
+    $params[] = $filterCategory;
+}
+
+if (!empty($filterStatus)) {
+    $where[] = "a.status = ?";
+    $params[] = $filterStatus;
+}
+
+// Fetch categories for filter dropdown
+$categories = [];
 try {
-    // 1. Total articles
-    $totalArticles = (int)$db->query("SELECT COUNT(*) FROM articles WHERE status = 'approved'")->fetchColumn();
-
-    // 2. Pending submissions
-    $pendingSubmissions = (int)$db->query("SELECT COUNT(*) FROM articles WHERE status = 'pending'")->fetchColumn();
-
-    // 3. Total views
-    $totalViews = (int)$db->query("SELECT COALESCE(SUM(views_count), 0) FROM articles")->fetchColumn();
-
-    // 4. Total comments
-    $totalComments = (int)$db->query("SELECT COUNT(*) FROM comments")->fetchColumn();
-
-    // 5. Recent student submissions awaiting review
-    $stmt = $db->query("
-        SELECT a.*, c.name as category_name, c.badge_color, u.full_name as author_name, u.student_id
-        FROM articles a
-        JOIN categories c ON a.category_id = c.id
-        JOIN users u ON a.author_id = u.id
-        WHERE a.status = 'pending'
-        ORDER BY a.created_at DESC
-        LIMIT 5
-    ");
-    $recentSubmissions = $stmt->fetchAll();
-
-    // 6. Recent published articles
-    $stmt = $db->query("
-        SELECT a.*, c.name as category_name, c.badge_color, u.full_name as author_name
-        FROM articles a
-        JOIN categories c ON a.category_id = c.id
-        JOIN users u ON a.author_id = u.id
-        WHERE a.status = 'approved'
-        ORDER BY a.published_at DESC
-        LIMIT 5
-    ");
-    $recentArticles = $stmt->fetchAll();
-
-    // 7. Recent comments
-    $stmt = $db->query("
-        SELECT cm.*, u.full_name as user_name, a.title as article_title, a.slug as article_slug
-        FROM comments cm
-        JOIN users u ON cm.user_id = u.id
-        JOIN articles a ON cm.article_id = a.id
-        ORDER BY cm.created_at DESC
-        LIMIT 4
-    ");
-    $recentComments = $stmt->fetchAll();
-
+    $cStmt = $db->query("SELECT * FROM categories ORDER BY name ASC");
+    $categories = $cStmt->fetchAll();
 } catch (PDOException $e) {}
 
-$pageTitle = 'Dashboard Overview';
+// Fetch articles
+$articles = [];
+try {
+    $sql = "
+        SELECT a.*, c.name as category_name, c.badge_color, u.full_name as author_name,
+               (SELECT COUNT(*) FROM comments cm WHERE cm.article_id = a.id) as comments_count
+        FROM articles a
+        JOIN categories c ON a.category_id = c.id
+        JOIN users u ON a.author_id = u.id
+        WHERE " . implode(' AND ', $where) . "
+        ORDER BY a.created_at DESC
+    ";
+    $stmt = $db->prepare($sql);
+    $stmt->execute($params);
+    $articles = $stmt->fetchAll();
+} catch (PDOException $e) {}
+
+$pageTitle = 'Manage News Articles';
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $pageTitle; ?> – NSBM NewsDesk Admin</title>
+    <title><?php echo $pageTitle; ?> - NSBM NewsDesk Admin</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,800;1,700&display=swap" rel="stylesheet">
@@ -89,162 +114,141 @@ $pageTitle = 'Dashboard Overview';
 </head>
 <body>
     <div class="admin-layout">
-        <!-- Sidebar -->
         <?php include __DIR__ . '/../includes/admin_sidebar.php'; ?>
 
-        <!-- Main Body -->
         <div class="admin-main">
             <?php include __DIR__ . '/../includes/admin_header.php'; ?>
 
-            <!-- Page Header -->
-            <div class="admin-page-header">
-                <h1>Dashboard Overview</h1>
-                <p>Welcome back! Here's a snapshot of the NSBM NewsDesk activity.</p>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+                <div>
+                    <h1 style="font-size: 1.5rem; font-weight: 800; color: var(--text-1); margin-bottom: 4px;">
+                        All News Articles (CRUD)
+                    </h1>
+                    <p style="color: var(--text-3); font-size: 0.9rem;">
+                        Create, update, toggle featured/breaking, and delete campus stories.
+                    </p>
+                </div>
+                <a href="article_create.php" class="btn btn-primary">
+                    + Create New Article
+                </a>
             </div>
 
-            <!-- KPI Metric Cards -->
-            <div class="kpi-grid">
-                <div class="kpi-card">
-                    <span class="kpi-title">Published Articles</span>
-                    <div class="kpi-number"><?php echo number_format($totalArticles); ?></div>
-                    <span class="kpi-sub">Live on campus portal</span>
-                </div>
-
-                <div class="kpi-card danger">
-                    <span class="kpi-title">Pending Submissions</span>
-                    <div class="kpi-number" style="color: <?php echo $pendingSubmissions > 0 ? 'var(--urgent)' : 'var(--text-1)'; ?>;">
-                        <?php echo $pendingSubmissions; ?>
+            <!-- Filter Controls -->
+            <div class="filter-search-bar" style="margin-bottom: 24px;">
+                <form action="articles.php" method="GET" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                    <div style="flex: 2; min-width: 240px;">
+                        <input type="text" name="q" value="<?php echo htmlspecialchars($searchQuery); ?>" placeholder="Search by title or content..." class="form-control" style="padding: 8px 12px;">
                     </div>
-                    <span class="kpi-sub">Awaiting editorial review</span>
-                </div>
 
-                <div class="kpi-card info">
-                    <span class="kpi-title">Total Readership</span>
-                    <div class="kpi-number"><?php echo number_format($totalViews); ?></div>
-                    <span class="kpi-sub">Cumulative page views</span>
-                </div>
+                    <div style="flex: 1; min-width: 160px;">
+                        <select name="category" class="form-control" style="padding: 8px 12px;">
+                            <option value="">All Categories</option>
+                            <?php foreach ($categories as $cat): ?>
+                                <option value="<?php echo htmlspecialchars($cat['slug']); ?>" <?php echo ($filterCategory === $cat['slug']) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($cat['name']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
 
-                <div class="kpi-card warning">
-                    <span class="kpi-title">Reader Comments</span>
-                    <div class="kpi-number"><?php echo number_format($totalComments); ?></div>
-                    <span class="kpi-sub">Student engagement posts</span>
-                </div>
+                    <div style="flex: 1; min-width: 140px;">
+                        <select name="status" class="form-control" style="padding: 8px 12px;">
+                            <option value="">All Statuses</option>
+                            <option value="approved" <?php echo ($filterStatus === 'approved') ? 'selected' : ''; ?>>Approved</option>
+                            <option value="pending" <?php echo ($filterStatus === 'pending') ? 'selected' : ''; ?>>Pending</option>
+                            <option value="rejected" <?php echo ($filterStatus === 'rejected') ? 'selected' : ''; ?>>Rejected</option>
+                            <option value="draft" <?php echo ($filterStatus === 'draft') ? 'selected' : ''; ?>>Draft</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-sm" style="height: 38px;">Filter</button>
+                    <?php if (!empty($searchQuery) || !empty($filterCategory) || !empty($filterStatus)): ?>
+                        <a href="articles.php" class="btn btn-outline btn-sm" style="height: 38px;">Reset</a>
+                    <?php endif; ?>
+                </form>
             </div>
 
-            <!-- Pending Review Action Card -->
-            <?php if (!empty($recentSubmissions)): ?>
-                <div class="table-card" style="margin-bottom: 28px; border-left: 4px solid var(--accent);">
-                    <div class="table-header table-header-alert">
-                        <div>
-                            <h3 style="display: flex; align-items: center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px; color: var(--accent); flex-shrink: 0;"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Action Required: <?php echo count($recentSubmissions); ?> Submission<?php echo count($recentSubmissions) !== 1 ? 's' : ''; ?> Awaiting Approval</h3>
-                            <p>Review and approve or reject submissions from student clubs and societies.</p>
-                        </div>
-                        <a href="submissions.php" class="btn btn-accent btn-sm">Review All &rarr;</a>
-                    </div>
-                    <div class="table-wrap">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Headline</th>
-                                    <th>Author</th>
-                                    <th>Category</th>
-                                    <th>Submitted</th>
-                                    <th style="text-align: right;">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($recentSubmissions as $sub): ?>
+            <!-- Articles Table -->
+            <div class="table-card">
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">ID</th>
+                                <th style="width: 70px;">Cover</th>
+                                <th>Headline</th>
+                                <th>Category</th>
+                                <th>Author</th>
+                                <th>Status</th>
+                                <th style="text-align: center;">Featured</th>
+                                <th style="text-align: center;">Breaking</th>
+                                <th>Views</th>
+                                <th style="text-align: right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (!empty($articles)): ?>
+                                <?php foreach ($articles as $art): ?>
                                     <tr>
-                                        <td><strong style="color: var(--text-1);"><?php echo htmlspecialchars($sub['title']); ?></strong></td>
-                                        <td style="color: var(--text-2);"><?php echo htmlspecialchars($sub['author_name']); ?> <span style="font-size:0.75rem; color:var(--text-4);">(<?php echo htmlspecialchars($sub['student_id']); ?>)</span></td>
+                                        <td><code>#<?php echo $art['id']; ?></code></td>
                                         <td>
-                                            <span class="badge-cat" style="background-color: <?php echo htmlspecialchars($sub['badge_color'] ?: '#006a4e'); ?>; font-size:0.72rem;">
-                                                <?php echo htmlspecialchars($sub['category_name']); ?>
-                                            </span>
+                                            <div style="width: 50px; height: 36px; border-radius: 4px; overflow: hidden; background: var(--text-1);">
+                                                <img src="../<?php echo htmlspecialchars($art['image_url'] ?: 'assets/images/default-news.svg'); ?>" alt="" style="width: 100%; height: 100%; object-fit: cover;">
+                                            </div>
                                         </td>
-                                        <td><?php echo timeAgo($sub['created_at']); ?></td>
-                                        <td style="text-align: right;">
-                                            <a href="submissions.php?review=<?php echo $sub['id']; ?>" class="btn btn-primary btn-sm" style="padding: 4px 10px; font-size: 0.8rem;">
-                                                Review &rarr;
+                                        <td>
+                                            <a href="../article.php?slug=<?php echo htmlspecialchars($art['slug']); ?>" target="_blank" style="font-weight: 700; color: var(--text-1); display: block; margin-bottom: 2px;">
+                                                <?php echo htmlspecialchars($art['title']); ?>
                                             </a>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            <?php endif; ?>
-
-            <!-- Two Column Grid: Published News & Latest Comments -->
-            <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 24px;">
-                <!-- Left: Recently Published Articles -->
-                <div class="table-card">
-                    <div class="table-header">
-                        <h3>Recent Published Stories</h3>
-                        <a href="articles.php" style="font-size: 0.85rem; font-weight: 600; color: var(--brand);">Manage Articles &rarr;</a>
-                    </div>
-                    <div class="table-wrap">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Title</th>
-                                    <th>Category</th>
-                                    <th>Views</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($recentArticles as $art): ?>
-                                    <tr>
-                                        <td>
-                                            <a href="../article.php?slug=<?php echo htmlspecialchars($art['slug']); ?>" target="_blank"
-                                               style="font-weight: 600; color: var(--text-1);">
-                                                <?php echo htmlspecialchars(truncateWords($art['title'], 6)); ?>
-                                            </a>
+                                            <span style="font-size: 0.78rem; color: var(--text-3); display: inline-flex; align-items: center;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:3px;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> <?php echo formatDate($art['published_at'] ?: $art['created_at']); ?></span>
                                         </td>
                                         <td>
-                                            <span class="badge-cat" style="background-color: <?php echo htmlspecialchars($art['badge_color'] ?: '#006a4e'); ?>; font-size:0.7rem; padding: 2px 6px;">
+                                            <span class="badge-cat" style="background-color: <?php echo htmlspecialchars($art['badge_color'] ?: '#006a4e'); ?>; font-size: 0.72rem;">
                                                 <?php echo htmlspecialchars($art['category_name']); ?>
                                             </span>
                                         </td>
-                                        <td style="color: var(--text-3); font-size: 0.85rem;">
-                                            <?php echo number_format($art['views_count']); ?>
+                                        <td style="font-size: 0.85rem;">
+                                            <?php echo htmlspecialchars($art['author_name']); ?>
                                         </td>
-                                        <td style="font-size: 0.8rem; color: var(--text-3);"><?php echo formatDate($art['published_at']); ?></td>
+                                        <td>
+                                            <span class="status-badge status-<?php echo htmlspecialchars($art['status']); ?>">
+                                                <?php echo ucfirst($art['status']); ?>
+                                            </span>
+                                        </td>
+                                        <!-- Featured Toggle -->
+                                        <td style="text-align: center;">
+                                            <a href="articles.php?toggle_featured=<?php echo $art['id']; ?>" class="btn btn-sm <?php echo $art['is_featured'] ? 'btn-accent' : 'btn-outline'; ?>" style="padding: 2px 8px; font-size: 0.74rem; display: inline-flex; align-items: center; gap: 3px;">
+                                                <?php echo $art['is_featured'] ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Yes' : 'No'; ?>
+                                            </a>
+                                        </td>
+                                        <!-- Breaking Toggle -->
+                                        <td style="text-align: center;">
+                                            <a href="articles.php?toggle_breaking=<?php echo $art['id']; ?>" class="btn btn-sm <?php echo $art['is_breaking'] ? 'btn-danger' : 'btn-outline'; ?>" style="padding: 2px 8px; font-size: 0.74rem; display: inline-flex; align-items: center; gap: 3px;">
+                                                <?php echo $art['is_breaking'] ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Active' : 'Off'; ?>
+                                            </a>
+                                        </td>
+                                        <td><span style="display: inline-flex; align-items: center; gap: 3px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--text-3);"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><?php echo number_format($art['views_count']); ?></span></td>
+                                        <td style="text-align: right;">
+                                            <div style="display: flex; gap: 6px; justify-content: flex-end;">
+                                                <a href="article_edit.php?id=<?php echo $art['id']; ?>" class="btn btn-outline btn-sm" style="padding: 4px 10px;">
+                                                    Edit
+                                                </a>
+                                                <a href="articles.php?action=delete&id=<?php echo $art['id']; ?>" class="btn btn-danger btn-sm" style="padding: 4px 10px;" onclick="return confirm('Permanently delete this article and all associated comments?');">
+                                                    Delete
+                                                </a>
+                                            </div>
+                                        </td>
                                     </tr>
                                 <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Right: Latest Reader Comments -->
-                <div class="table-card">
-                    <div class="table-header">
-                        <h3>Latest Comments</h3>
-                        <a href="comments.php" style="font-size: 0.85rem; font-weight: 600; color: var(--brand);">Moderate &rarr;</a>
-                    </div>
-                    <div style="padding: 16px; display: flex; flex-direction: column; gap: 14px;">
-                        <?php if (!empty($recentComments)): ?>
-                            <?php foreach ($recentComments as $cm): ?>
-                                <div class="admin-comment-card">
-                                    <div class="admin-comment-row">
-                                        <span class="admin-comment-author"><?php echo htmlspecialchars($cm['user_name']); ?></span>
-                                        <span><?php echo timeAgo($cm['created_at']); ?></span>
-                                    </div>
-                                    <div class="admin-comment-text">
-                                        "<?php echo htmlspecialchars(truncateWords($cm['comment_text'], 14)); ?>"
-                                    </div>
-                                    <div class="admin-comment-article">
-                                        on: <?php echo htmlspecialchars(truncateWords($cm['article_title'], 5)); ?>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <p style="color: var(--text-4); font-size: 0.88rem;">No comments recorded yet.</p>
-                        <?php endif; ?>
-                    </div>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="10" style="text-align: center; padding: 40px; color: var(--text-3);">
+                                        No articles found matching the filter criteria.
+                                    </td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
