@@ -1,6 +1,6 @@
 <?php
 /**
- * Create News Article (Admin)
+ * Edit News Article (Admin)
  * Module: Web and Mobile Application Development (SE102.3)
  * NSBM Green University - Faculty of Computing
  */
@@ -8,10 +8,19 @@
 require_once __DIR__ . '/../config/functions.php';
 requireAdmin('../login.php');
 
-$user = currentUser();
 $db = getDB();
 if (!$db) {
     die("Database connection error. Please run setup.php.");
+}
+
+$id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
+$stmt = $db->prepare("SELECT * FROM articles WHERE id = ?");
+$stmt->execute([$id]);
+$article = $stmt->fetch();
+
+if (!$article) {
+    setFlashMessage('danger', 'Article not found.');
+    redirect('articles.php');
 }
 
 $categories = [];
@@ -21,20 +30,20 @@ try {
 } catch (PDOException $e) {}
 
 $error = '';
-$title = '';
-$categoryId = '';
-$excerpt = '';
-$content = '';
-$status = 'approved';
-$isFeatured = 0;
-$isBreaking = 0;
+$title = $article['title'];
+$categoryId = $article['category_id'];
+$excerpt = $article['excerpt'];
+$content = $article['content'];
+$status = $article['status'];
+$isFeatured = $article['is_featured'];
+$isBreaking = $article['is_breaking'];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = trim($_POST['title'] ?? '');
     $categoryId = (int)($_POST['category_id'] ?? 0);
     $excerpt = trim($_POST['excerpt'] ?? '');
     $content = trim($_POST['content'] ?? '');
-    $status = in_array($_POST['status'] ?? '', ['approved', 'draft', 'pending']) ? $_POST['status'] : 'approved';
+    $status = in_array($_POST['status'] ?? '', ['approved', 'draft', 'pending', 'rejected']) ? $_POST['status'] : 'approved';
     $isFeatured = isset($_POST['is_featured']) ? 1 : 0;
     $isBreaking = isset($_POST['is_breaking']) ? 1 : 0;
 
@@ -43,47 +52,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (strlen($title) < 5) {
         $error = 'Headline must be at least 5 characters long.';
     } else {
-        // Handle cover photo upload
-        $imagePath = null;
+        $imagePath = $article['image_url']; // keep existing by default
         if (isset($_FILES['cover_image']) && $_FILES['cover_image']['error'] !== UPLOAD_ERR_NO_FILE) {
             $uploadResult = uploadImage($_FILES['cover_image'], 'assets/uploads/articles/');
             if (!$uploadResult['success']) {
-                $error = 'Image error: ' . $uploadResult['error'];
+                $error = 'Image upload error: ' . $uploadResult['error'];
             } else {
                 $imagePath = $uploadResult['filename'];
             }
         }
 
         if (empty($error)) {
-            $slug = slugify($title) . '-' . time();
             try {
-                $stmt = $db->prepare("
-                    INSERT INTO articles (title, slug, excerpt, content, category_id, author_id, image_url, status, is_featured, is_breaking, views_count, published_at, created_at)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, NOW(), NOW())
+                $upd = $db->prepare("
+                    UPDATE articles 
+                    SET title = ?, excerpt = ?, content = ?, category_id = ?, 
+                        image_url = ?, status = ?, is_featured = ?, is_breaking = ?, updated_at = NOW()
+                    WHERE id = ?
                 ");
-                $stmt->execute([
+                $upd->execute([
                     $title,
-                    $slug,
                     $excerpt ?: truncateWords($content, 20),
                     $content,
                     $categoryId,
-                    $user['id'],
                     $imagePath,
                     $status,
                     $isFeatured,
-                    $isBreaking
+                    $isBreaking,
+                    $id
                 ]);
 
-                setFlashMessage('success', 'News article "' . htmlspecialchars($title) . '" created successfully!');
+                setFlashMessage('success', 'Article #' . $id . ' updated successfully!');
                 redirect('articles.php');
             } catch (PDOException $e) {
-                $error = 'Database error: ' . $e->getMessage();
+                $error = 'Database update error: ' . $e->getMessage();
             }
         }
     }
 }
 
-$pageTitle = 'Create News Article';
+$pageTitle = 'Edit Article #' . $id;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -108,11 +116,14 @@ $pageTitle = 'Create News Article';
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
                     <div>
                         <h1 style="font-size: 1.5rem; font-weight: 800; color: var(--text-1); margin-bottom: 4px;">
-                            Publish Campus News Article
+                            Edit Article #<?php echo $id; ?>
                         </h1>
-                        <p style="color: var(--text-3); font-size: 0.9rem;">Author and publish official articles to the university feed.</p>
+                        <p style="color: var(--text-3); font-size: 0.9rem;">Modify headline, content, category, or promotional tags.</p>
                     </div>
-                    <a href="articles.php" class="btn btn-outline btn-sm">&larr; Back to Articles</a>
+                    <div style="display: flex; gap: 8px;">
+                        <a href="../article.php?slug=<?php echo htmlspecialchars($article['slug']); ?>" target="_blank" class="btn btn-outline btn-sm">Preview Live</a>
+                        <a href="articles.php" class="btn btn-outline btn-sm">&larr; Back to Articles</a>
+                    </div>
                 </div>
 
                 <?php if (!empty($error)): ?>
@@ -122,17 +133,16 @@ $pageTitle = 'Create News Article';
                 <?php endif; ?>
 
                 <div class="form-card" style="margin: 0; max-width: 100%;">
-                    <form action="article_create.php" method="POST" enctype="multipart/form-data" id="articleForm">
+                    <form action="article_edit.php?id=<?php echo $id; ?>" method="POST" enctype="multipart/form-data" id="articleForm">
                         <div class="form-group">
                             <label for="articleTitle" class="form-label">Headline / Title <span class="required">*</span></label>
-                            <input type="text" name="title" id="articleTitle" class="form-control" placeholder="e.g. NSBM Announces 2026 Undergraduate Research Symposium" value="<?php echo htmlspecialchars($title); ?>" required>
+                            <input type="text" name="title" id="articleTitle" class="form-control" value="<?php echo htmlspecialchars($title); ?>" required>
                         </div>
 
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="articleCategory" class="form-label">Category <span class="required">*</span></label>
                                 <select name="category_id" id="articleCategory" class="form-control" required>
-                                    <option value="">-- Select Category --</option>
                                     <?php foreach ($categories as $cat): ?>
                                         <option value="<?php echo $cat['id']; ?>" <?php echo ($categoryId == $cat['id']) ? 'selected' : ''; ?>>
                                             <?php echo htmlspecialchars($cat['name']); ?>
@@ -144,24 +154,32 @@ $pageTitle = 'Create News Article';
                             <div class="form-group">
                                 <label for="articleStatus" class="form-label">Publication Status</label>
                                 <select name="status" id="articleStatus" class="form-control">
-                                    <option value="approved" <?php echo ($status === 'approved') ? 'selected' : ''; ?>>Approved (Publish Live)</option>
-                                    <option value="draft" <?php echo ($status === 'draft') ? 'selected' : ''; ?>>Draft (Hidden)</option>
+                                    <option value="approved" <?php echo ($status === 'approved') ? 'selected' : ''; ?>>Approved (Public)</option>
+                                    <option value="pending" <?php echo ($status === 'pending') ? 'selected' : ''; ?>>Pending Review</option>
+                                    <option value="rejected" <?php echo ($status === 'rejected') ? 'selected' : ''; ?>>Rejected</option>
+                                    <option value="draft" <?php echo ($status === 'draft') ? 'selected' : ''; ?>>Draft</option>
                                 </select>
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label for="articleExcerpt" class="form-label">Short Excerpt (Summary)</label>
-                            <textarea name="excerpt" id="articleExcerpt" class="form-control" rows="2" style="min-height: 70px;" placeholder="Brief lead paragraph for preview cards..."><?php echo htmlspecialchars($excerpt); ?></textarea>
+                            <textarea name="excerpt" id="articleExcerpt" class="form-control" rows="2" style="min-height: 70px;"><?php echo htmlspecialchars($excerpt); ?></textarea>
                         </div>
 
                         <div class="form-group">
                             <label for="articleContent" class="form-label">Full Article Content <span class="required">*</span></label>
-                            <textarea name="content" id="articleContent" class="form-control" rows="8" placeholder="Complete article body... (HTML tags like <p>, <strong> are supported)" required><?php echo htmlspecialchars($content); ?></textarea>
+                            <textarea name="content" id="articleContent" class="form-control" rows="8" required><?php echo htmlspecialchars($content); ?></textarea>
                         </div>
 
                         <div class="form-group">
                             <label for="articleImageInput" class="form-label">Cover Photo</label>
+                            <?php if (!empty($article['image_url'])): ?>
+                                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
+                                    <img src="../<?php echo htmlspecialchars($article['image_url']); ?>" alt="" style="width: 100px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border);">
+                                    <span style="font-size: 0.82rem; color: var(--text-3);">Current cover photo. Select a new file below to replace it.</span>
+                                </div>
+                            <?php endif; ?>
                             <input type="file" name="cover_image" id="articleImageInput" class="form-control" accept="image/jpeg,image/png,image/webp">
                             <div id="imagePreviewContainer"></div>
                         </div>
@@ -180,7 +198,7 @@ $pageTitle = 'Create News Article';
 
                         <div style="display: flex; justify-content: flex-end; gap: 12px;">
                             <a href="articles.php" class="btn btn-outline">Cancel</a>
-                            <button type="submit" class="btn btn-primary">Publish Article &rarr;</button>
+                            <button type="submit" class="btn btn-primary">Save Changes &rarr;</button>
                         </div>
                     </form>
                 </div>
