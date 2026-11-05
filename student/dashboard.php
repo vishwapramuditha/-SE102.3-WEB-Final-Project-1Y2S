@@ -15,7 +15,13 @@ if (!$db) {
     die("Database connection error. Please run setup.php.");
 }
 
-
+// Student KPI Metrics
+$submissionCount = 0;
+$approvedCount   = 0;
+$bookmarkCount   = 0;
+$subscriptionCount = 0;
+$mySubmissions   = [];
+$myBookmarks     = [];
 
 try {
     $stmt = $db->prepare("SELECT COUNT(*) FROM articles WHERE author_id = ?");
