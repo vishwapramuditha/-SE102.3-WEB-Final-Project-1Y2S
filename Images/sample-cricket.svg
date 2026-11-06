@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
+  <defs>
+    <linearGradient id="bg3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a0800"/>
+      <stop offset="60%" stop-color="#2d1200"/>
+      <stop offset="100%" stop-color="#0f1a00"/>
+    </linearGradient>
+    <linearGradient id="gbar3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fb923c"/>
+      <stop offset="100%" stop-color="#ef4444"/>
+    </linearGradient>
+    <linearGradient id="overlay3" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1a0800" stop-opacity="0.97"/>
+      <stop offset="55%" stop-color="#1a0800" stop-opacity="0.80"/>
+      <stop offset="100%" stop-color="#1a0800" stop-opacity="0.0"/>
+    </linearGradient>
+    <radialGradient id="fieldGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1a4010" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#0a2008" stop-opacity="0.2"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="450" fill="url(#bg3)"/>
+  <!-- Cricket field circles -->
+  <ellipse cx="600" cy="250" rx="230" ry="160" fill="url(#fieldGrad)" stroke="#2d5020" stroke-width="1" opacity="0.5"/>
+  <ellipse cx="600" cy="250" rx="150" ry="100" fill="none" stroke="#2d5020" stroke-width="0.8" opacity="0.4"/>
+  <!-- Cricket bat -->
+  <g transform="translate(480, 60) rotate(35)">
+    <rect x="80" y="10" width="30" height="200" rx="8" fill="#c8902a"/>
+    <rect x="80" y="10" width="30" height="160" rx="8" fill="#d4a843"/>
+    <rect x="83" y="170" width="24" height="50" rx="5" fill="#8b5e2a"/>
+    <!-- Bat edges -->
+    <rect x="80" y="10" width="4" height="160" rx="2" fill="#e8c060"/>
+    <rect x="106" y="10" width="4" height="160" rx="2" fill="#b07830"/>
+    <!-- Grain lines -->
+    <line x1="88" y1="30" x2="88" y2="160" stroke="#b07830" stroke-width="0.8" opacity="0.4"/>
+    <line x1="95" y1="30" x2="95" y2="160" stroke="#b07830" stroke-width="0.8" opacity="0.4"/>
+    <line x1="102" y1="30" x2="102" y2="160" stroke="#b07830" stroke-width="0.8" opacity="0.4"/>
+  </g>
+  <!-- Cricket ball -->
+  <circle cx="680" cy="180" r="40" fill="#cc2200"/>
+  <circle cx="680" cy="180" r="40" fill="none" stroke="#aa1800" stroke-width="1.5"/>
+  <!-- Ball seam -->
+  <path d="M650 170 Q680 155 710 170" fill="none" stroke="#fff" stroke-width="1.5" opacity="0.6"/>
+  <path d="M648 188 Q680 203 712 188" fill="none" stroke="#fff" stroke-width="1.5" opacity="0.6"/>
+  <circle cx="680" cy="180" r="2" fill="#fff" opacity="0.3"/>
+  <!-- Stumps -->
+  <g transform="translate(580, 290)">
+    <rect x="0" y="0" width="7" height="80" rx="3" fill="#f5f0e8"/>
+    <rect x="18" y="0" width="7" height="80" rx="3" fill="#f5f0e8"/>
+    <rect x="36" y="0" width="7" height="80" rx="3" fill="#f5f0e8"/>
+    <!-- Bails -->
+    <rect x="-2" y="-4" width="12" height="5" rx="2" fill="#d4c090"/>
+    <rect x="16" y="-4" width="12" height="5" rx="2" fill="#d4c090"/>
+    <rect x="34" y="-4" width="12" height="5" rx="2" fill="#d4c090"/>
+  </g>
+  <!-- Speed lines -->
+  <g stroke="#fb923c" stroke-width="1.5" opacity="0.3">
+    <line x1="600" y1="160" x2="500" y2="148"/><line x1="598" y1="178" x2="498" y2="178"/>
+    <line x1="600" y1="196" x2="502" y2="207"/>
+  </g>
+  <!-- Left overlay -->
+  <rect width="800" height="450" fill="url(#overlay3)"/>
+  <!-- Accent bar -->
+  <rect x="0" y="0" width="5" height="450" fill="url(#gbar3)"/>
+  <!-- Category badge -->
+  <rect x="28" y="30" width="68" height="24" rx="4" fill="#fb923c"/>
+  <text x="62" y="47" font-family="Inter,sans-serif" font-size="11" font-weight="700" fill="#fff" text-anchor="middle" letter-spacing="0.5">SPORTS</text>
+  <!-- Headline -->
+  <text x="28" y="105" font-family="Georgia,serif" font-size="26" font-weight="bold" fill="#ffffff">NSBM Green Lions</text>
+  <text x="28" y="138" font-family="Georgia,serif" font-size="26" font-weight="bold" fill="#ffffff">Clinch Victory at the</text>
+  <text x="28" y="171" font-family="Georgia,serif" font-size="26" font-weight="bold" fill="#fb923c">Inter-University Cricket</text>
+  <!-- Excerpt -->
+  <text x="28" y="215" font-family="Inter,sans-serif" font-size="13" fill="rgba(255,255,255,0.65)">A brilliant century from our captain led NSBM</text>
+  <text x="28" y="233" font-family="Inter,sans-serif" font-size="13" fill="rgba(255,255,255,0.65)">to a historic 8-wicket win in the final.</text>
+  <!-- Meta -->
+  <text x="28" y="285" font-family="Inter,sans-serif" font-size="11" fill="rgba(255,255,255,0.40)">NSBM NewsDesk  •  Sports  •  nsbm.ac.lk</text>
+  <!-- NSBM badge -->
+  <rect x="28" y="400" width="130" height="28" rx="14" fill="rgba(251,146,60,0.12)" stroke="#fb923c" stroke-width="1"/>
+  <text x="93" y="419" font-family="Inter,sans-serif" font-size="11" font-weight="700" fill="#fb923c" text-anchor="middle" letter-spacing="0.5">NSBM GREEN UNIV.</text>
+</svg>

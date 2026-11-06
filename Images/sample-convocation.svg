@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <defs>
+    <linearGradient id="gradBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b132b" />
+      <stop offset="60%" stop-color="#1c2541" />
+      <stop offset="100%" stop-color="#004643" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="450" fill="url(#gradBg)" />
+
+  <!-- Stage Lights & Rays -->
+  <g opacity="0.15">
+    <polygon points="400,0 200,450 600,450" fill="#fef08a" />
+    <polygon points="150,0 0,450 350,450" fill="#fef08a" />
+    <polygon points="650,0 450,450 800,450" fill="#fef08a" />
+  </g>
+
+  <!-- Auditorium Architectural Arches -->
+  <g fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-opacity="0.25">
+    <ellipse cx="400" cy="450" rx="350" ry="240" />
+    <ellipse cx="400" cy="450" rx="270" ry="180" />
+    <ellipse cx="400" cy="450" rx="190" ry="120" />
+  </g>
+
+  <!-- Giant Graduation Cap (Mortarboard) -->
+  <g transform="translate(400, 200)">
+    <!-- Cap Skull -->
+    <path d="M -60 15 L 0 45 L 60 15 L 45 60 C 20 75 -20 75 -45 60 Z" fill="#0f172a" stroke="#d97706" stroke-width="2" />
+    <!-- Cap Diamond Flat Top -->
+    <polygon points="0,-45 110,0 0,45 -110,0" fill="#1e293b" stroke="url(#goldGrad)" stroke-width="3.5" />
+    <!-- Center Button -->
+    <circle cx="0" cy="0" r="8" fill="#fbbf24" />
+    <!-- Tassel String and Fringe -->
+    <path d="M 0 0 C 40 -10 70 20 85 55" fill="none" stroke="#fbbf24" stroke-width="3" />
+    <rect x="80" y="55" width="10" height="24" rx="2" fill="#f59e0b" />
+  </g>
+
+  <!-- Flying Mortarboards Celebrations (Silhouettes) -->
+  <g fill="#334155" opacity="0.75" transform="rotate(-15, 200, 120)">
+    <polygon points="200,90 240,110 200,130 160,110" />
+  </g>
+  <g fill="#334155" opacity="0.6" transform="rotate(22, 620, 110)">
+    <polygon points="620,85 655,100 620,115 585,100" />
+  </g>
+  <g fill="#334155" opacity="0.5" transform="rotate(-8, 110, 220)">
+    <polygon points="110,205 135,218 110,230 85,218" />
+  </g>
+
+  <!-- Diploma Degree Scroll with Ribbon -->
+  <g transform="translate(240, 310)">
+    <!-- Rolled Parchment -->
+    <rect x="0" y="0" width="140" height="36" rx="6" fill="#fef3c7" stroke="#b45309" stroke-width="1.5" />
+    <!-- Inner roll curl -->
+    <ellipse cx="8" cy="18" rx="6" ry="18" fill="#fde68a" stroke="#b45309" stroke-width="1" />
+    <!-- Red Silk Ribbon Tie -->
+    <rect x="62" y="-4" width="16" height="44" rx="2" fill="#dc2626" />
+    <polygon points="62,40 70,55 78,40" fill="#dc2626" />
+  </g>
+
+  <!-- Academic Laurel Wreath Symbol -->
+  <g transform="translate(560, 310)" stroke="#fbbf24" stroke-width="2" fill="none">
+    <circle cx="25" cy="18" r="24" stroke-opacity="0.2" fill="#047857" fill-opacity="0.3" />
+    <!-- Star of Excellence -->
+    <polygon points="25,8 28,15 36,16 30,22 32,29 25,25 18,29 20,22 14,16 22,15" fill="#fbbf24" stroke="none" />
+  </g>
+
+  <!-- Top Title Badge -->
+  <rect x="50" y="45" width="240" height="34" rx="6" fill="#1e293b" fill-opacity="0.9" stroke="#f59e0b" stroke-width="1.5" />
+  <text x="65" y="67" fill="#fbbf24" font-family="'Inter', sans-serif" font-size="12" font-weight="700" letter-spacing="1.5">ANNUAL CONVOCATION</text>
+</svg>
+
