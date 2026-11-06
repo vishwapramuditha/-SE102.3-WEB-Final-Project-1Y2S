@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#022c22" />
+      <stop offset="60%" stop-color="#064e3b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="crossGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+    <linearGradient id="buildGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#047857" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#022c22" stop-opacity="0.95" />
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="450" fill="url(#bgGrad)" />
+
+  <g stroke="#10b981" stroke-width="1" stroke-opacity="0.1">
+    <line x1="0" y1="90" x2="800" y2="90" />
+    <line x1="0" y1="180" x2="800" y2="180" />
+    <line x1="0" y1="270" x2="800" y2="270" />
+    <line x1="0" y1="360" x2="800" y2="360" />
+    <line x1="160" y1="0" x2="160" y2="450" />
+    <line x1="320" y1="0" x2="320" y2="450" />
+    <line x1="480" y1="0" x2="480" y2="450" />
+    <line x1="640" y1="0" x2="640" y2="450" />
+  </g>
+
+  <g fill="url(#buildGrad)" stroke="#10b981" stroke-width="2" stroke-opacity="0.3">
+    <rect x="180" y="140" width="180" height="230" rx="6" />
+    <rect x="360" y="180" width="220" height="190" rx="6" />
+    <path d="M 120 370 L 140 260 L 220 260 L 220 370 Z" />
+    <rect x="80" y="340" width="640" height="30" rx="4" fill="#059669" fill-opacity="0.25" stroke="#34d399" stroke-width="1.5" />
+  </g>
+
+  <g fill="#6ee7b7" fill-opacity="0.4">
+    <rect x="200" y="165" width="22" height="16" rx="2" />
+    <rect x="235" y="165" width="22" height="16" rx="2" />
+    <rect x="270" y="165" width="22" height="16" rx="2" />
+    <rect x="305" y="165" width="22" height="16" rx="2" />
+
+    <rect x="200" y="195" width="22" height="16" rx="2" />
+    <rect x="235" y="195" width="22" height="16" rx="2" />
+    <rect x="270" y="195" width="22" height="16" rx="2" />
+    <rect x="305" y="195" width="22" height="16" rx="2" />
+
+    <rect x="200" y="225" width="22" height="16" rx="2" />
+    <rect x="235" y="225" width="22" height="16" rx="2" />
+    <rect x="270" y="225" width="22" height="16" rx="2" />
+    <rect x="305" y="225" width="22" height="16" rx="2" />
+
+    <rect x="385" y="205" width="30" height="14" rx="2" />
+    <rect x="430" y="205" width="30" height="14" rx="2" />
+    <rect x="475" y="205" width="30" height="14" rx="2" />
+    <rect x="520" y="205" width="30" height="14" rx="2" />
+
+    <rect x="385" y="235" width="30" height="14" rx="2" />
+    <rect x="430" y="235" width="30" height="14" rx="2" />
+    <rect x="475" y="235" width="30" height="14" rx="2" />
+    <rect x="520" y="235" width="30" height="14" rx="2" />
+
+    <rect x="385" y="265" width="30" height="14" rx="2" />
+    <rect x="430" y="265" width="30" height="14" rx="2" />
+    <rect x="475" y="265" width="30" height="14" rx="2" />
+    <rect x="520" y="265" width="30" height="14" rx="2" />
+  </g>
+
+  <g transform="translate(620, 150)">
+    <circle cx="0" cy="0" r="54" fill="#064e3b" stroke="#34d399" stroke-width="3" />
+    <circle cx="0" cy="0" r="46" fill="#022c22" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4 3" />
+    <path d="M -10 -30 L 10 -30 L 10 -10 L 30 -10 L 30 10 L 10 10 L 10 30 L -10 30 L -10 10 L -30 10 L -30 -10 L -10 -10 Z" fill="url(#crossGrad)" />
+  </g>
+
+  <path d="M 60 370 L 220 370 L 240 370 L 255 330 L 270 410 L 285 350 L 300 380 L 315 370 L 740 370" fill="none" stroke="#34d399" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" />
+
+  <rect x="50" y="45" width="220" height="34" rx="6" fill="#065f46" fill-opacity="0.9" stroke="#34d399" stroke-width="1.5" />
+  <text x="65" y="67" fill="#ffffff" font-family="'Inter', sans-serif" font-size="12" font-weight="700" letter-spacing="1.5">FACULTY OF MEDICINE</text>
+</svg>
+

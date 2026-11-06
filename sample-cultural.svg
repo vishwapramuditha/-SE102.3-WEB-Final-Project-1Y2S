@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <defs>
+    <linearGradient id="cultBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#450a0a" />
+      <stop offset="50%" stop-color="#78350f" />
+      <stop offset="100%" stop-color="#064e3b" />
+    </linearGradient>
+    <linearGradient id="flameGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#dc2626" />
+      <stop offset="50%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#fef08a" />
+    </linearGradient>
+    <linearGradient id="brassGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d97706" />
+      <stop offset="50%" stop-color="#fbbf24" />
+      <stop offset="100%" stop-color="#b45309" />
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="450" fill="url(#cultBg)" />
+
+  <!-- Sun Rays & Festive Mandala Background Pattern -->
+  <g stroke="#f59e0b" stroke-width="1.2" stroke-opacity="0.2" fill="none">
+    <circle cx="400" cy="225" r="210" />
+    <circle cx="400" cy="225" r="160" />
+    <circle cx="400" cy="225" r="110" />
+    <!-- Rays -->
+    <line x1="400" y1="15" x2="400" y2="435" />
+    <line x1="190" y1="225" x2="610" y2="225" />
+    <line x1="251" y1="76" x2="549" y2="374" />
+    <line x1="251" y1="374" x2="549" y2="76" />
+  </g>
+
+  <!-- Traditional Sri Lankan Brass Oil Lamp (Pahana) -->
+  <g transform="translate(400, 220)">
+    <!-- Base Pedestal -->
+    <path d="M -60 170 C -40 150 40 150 60 170 Z" fill="url(#brassGrad)" stroke="#78350f" stroke-width="2" />
+    <!-- Vertical Lamp Pillar Column -->
+    <rect x="-10" y="-30" width="20" height="190" rx="4" fill="url(#brassGrad)" stroke="#78350f" stroke-width="1.5" />
+    <!-- Tier Discs -->
+    <ellipse cx="0" cy="90" rx="35" ry="8" fill="url(#brassGrad)" stroke="#78350f" stroke-width="1.5" />
+    <ellipse cx="0" cy="25" rx="45" ry="10" fill="url(#brassGrad)" stroke="#78350f" stroke-width="1.5" />
+    <ellipse cx="0" cy="-35" rx="55" ry="12" fill="url(#brassGrad)" stroke="#78350f" stroke-width="2" />
+
+    <!-- Rooster Top Crest (Traditional Gira / Hansa emblem) -->
+    <path d="M 0 -45 C -15 -65 -15 -90 0 -105 C 15 -90 15 -65 0 -45 Z" fill="url(#brassGrad)" stroke="#78350f" stroke-width="2" />
+    
+    <!-- Eternal Lamp Flame -->
+    <path d="M 0 -110 C -18 -135 -10 -160 0 -180 C 10 -160 18 -135 0 -110 Z" fill="url(#flameGrad)" />
+    <!-- Inner Flame Core -->
+    <path d="M 0 -118 C -8 -135 -4 -150 0 -165 C 4 -150 8 -135 0 -118 Z" fill="#ffffff" opacity="0.8" />
+  </g>
+
+  <!-- Traditional Drums (Geta Beraya) on Left and Right -->
+  <!-- Left Drum -->
+  <g transform="translate(160, 260) rotate(-15)">
+    <ellipse cx="0" cy="0" rx="45" ry="60" fill="#78350f" stroke="#f59e0b" stroke-width="3" />
+    <path d="M 0 -60 L 90 -40 L 90 40 L 0 60 Z" fill="#451a03" stroke="#f59e0b" stroke-width="2" />
+    <ellipse cx="90" cy="0" rx="20" ry="40" fill="#fed7aa" stroke="#78350f" stroke-width="2" />
+    <!-- Drum Strings (Varapata) -->
+    <line x1="0" y1="-50" x2="90" y2="-20" stroke="#fbbf24" stroke-width="1.5" />
+    <line x1="0" y1="-20" x2="90" y2="0" stroke="#fbbf24" stroke-width="1.5" />
+    <line x1="0" y1="10" x2="90" y2="20" stroke="#fbbf24" stroke-width="1.5" />
+    <line x1="0" y1="40" x2="90" y2="40" stroke="#fbbf24" stroke-width="1.5" />
+  </g>
+
+  <!-- Right Drum -->
+  <g transform="translate(640, 260) rotate(15)">
+    <ellipse cx="0" cy="0" rx="45" ry="60" fill="#78350f" stroke="#f59e0b" stroke-width="3" />
+    <path d="M 0 -60 L -90 -40 L -90 40 L 0 60 Z" fill="#451a03" stroke="#f59e0b" stroke-width="2" />
+    <ellipse cx="-90" cy="0" rx="20" ry="40" fill="#fed7aa" stroke="#78350f" stroke-width="2" />
+    <line x1="0" y1="-50" x2="-90" y2="-20" stroke="#fbbf24" stroke-width="1.5" />
+    <line x1="0" y1="-20" x2="-90" y2="0" stroke="#fbbf24" stroke-width="1.5" />
+    <line x1="0" y1="10" x2="-90" y2="20" stroke="#fbbf24" stroke-width="1.5" />
+    <line x1="0" y1="40" x2="-90" y2="40" stroke="#fbbf24" stroke-width="1.5" />
+  </g>
+
+  <!-- Top Badge -->
+  <rect x="50" y="45" width="220" height="34" rx="6" fill="#78350f" fill-opacity="0.9" stroke="#fbbf24" stroke-width="1.5" />
+  <text x="65" y="67" fill="#fbbf24" font-family="'Inter', sans-serif" font-size="12" font-weight="700" letter-spacing="1.5">SIYAPATHETERNA 2026</text>
+</svg>
+

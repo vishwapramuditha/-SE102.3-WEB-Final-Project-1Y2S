@@ -1,0 +1,13 @@
+# NSBM NewsDesk - Assets Image MIME Configuration
+<IfModule mod_mime.c>
+    AddType image/svg+xml .svg .svgz
+    <FilesMatch "^sample-.*\.jpg$">
+        ForceType image/svg+xml
+    </FilesMatch>
+</IfModule>
+
+<IfModule mod_headers.c>
+    <FilesMatch "\.(svg|svgz|jpg|jpeg|png|webp|gif|ico)$">
+        Header set Access-Control-Allow-Origin "*"
+    </FilesMatch>
+</IfModule>
