@@ -79,7 +79,13 @@ include __DIR__ . '/../includes/header.php';
             <table class="data-table">
                 <thead>
                     <tr>
-                        
+                        <th style="width: 70px;">Cover</th>
+                        <th>Title &amp; Headline</th>
+                        <th>Category</th>
+                        <th>Date Submitted</th>
+                        <th>Status</th>
+                        <th>Views / Comments</th>
+                        <th style="text-align: right;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
