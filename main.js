@@ -187,7 +187,12 @@ document.addEventListener('DOMContentLoaded', function () {
       let isValid = true;
       let errorMsg = '';
 
-     
+      if (name && name.value.trim().length < 3) {
+        errorMsg = 'Please enter your full name (minimum 3 characters).';
+        isValid = false;
+      } else if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
+        errorMsg = 'Please enter a valid email address.';
+        isValid = false;
       } else if (password && password.value.length < 6) {
         errorMsg = 'Password must be at least 6 characters long.';
         isValid = false;
