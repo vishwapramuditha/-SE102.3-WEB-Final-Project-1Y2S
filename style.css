@@ -289,8 +289,8 @@ div[style*="background: #fffbeb"] {
   text-transform: uppercase;
   line-height: 1;
 }
-.ticker-badge-red    { background: rgba(260, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); }
-.ticker-badge-orange { background: rgba(249, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.35); }
+.ticker-badge-red    { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); }
+.ticker-badge-orange { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.35); }
 .ticker-badge-green  { background: rgba(0, 168, 107, 0.2); color: var(--brand); border: 1px solid rgba(0, 168, 107, 0.35); }
 
 .ticker-headline {
